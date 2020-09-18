@@ -1,0 +1,33 @@
+apply plugin: 'java'
+
+repositories {
+  jcenter()
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  compile (
+          implementation('org.springframework.boot:spring-boot-starter-web:2.2.6.RELEASE') {
+            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+          },
+          'com.amazonaws.serverless:aws-serverless-java-container-springboot2:[1.4,)',
+          'io.symphonia:lambda-logging:1.0.1',
+          'org.springframework.security:spring-security-config:2.2.6.RELEASE',
+          'org.springframework.boot:spring-boot-starter-oauth2-client:2.2.6.RELEASE',
+          'org.apache.commons:commons-lang3:3.11'
+  )
+  testCompile("junit:junit")
+}
+
+task buildZip(type: Zip) {
+  from compileJava
+  from processResources
+  into('lib') {
+    from(configurations.compileClasspath) {
+      exclude 'tomcat-embed-*'
+    }
+  }
+}
+
+build.dependsOn buildZip

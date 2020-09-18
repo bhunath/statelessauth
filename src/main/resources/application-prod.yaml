@@ -1,0 +1,19 @@
+spring:
+  security:
+    enable-csrf : false
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: cd8b56749faa48a1eddd
+            clientSecret: f53419ad2a285ec71319cbcc0676c86d4637b327
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+logging:
+  level:
+    root: INFO
+#    org.springframework.web: ERROR
+#    com.howtodoinjava: DEBUG
+#    org.hibernate: ERROR

@@ -1,0 +1,11 @@
+spring:
+  main:
+    web-application-type: none
+  security:
+    enable-csrf: false
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: cd8b56749faa48a1eddd
+            clientSecret: f53419ad2a285ec71319cbcc0676c86d4637b327
