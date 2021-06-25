@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import static com.amazonaws.serverless.sample.springboot2.authrepo.HttpCookieOAuth2AuthorizationRequestRepository.AUTHORIZATION_REQUEST_COOKIE_NAME;
 import static com.amazonaws.serverless.sample.springboot2.authrepo.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI;
+import static com.amazonaws.serverless.sample.springboot2.configuration.SecurityConfiguration.SECURITY_CONTEXT;
 
 /**
  * Authentication success handler for redirecting the
@@ -35,7 +36,7 @@ public class OAuth2AuthenticationSuccessHandler
 		if(context != null && context.getAuthentication()!= null && context.getAuthentication().getPrincipal() != null ) {
 			DefaultOAuth2User user = (DefaultOAuth2User) context.getAuthentication().getPrincipal();
 			String userInfo = HttpCookieOAuth2AuthorizationRequestRepository.serialize(user);
-			Cookie cookie = new Cookie("SECURITY_CONTEXT", userInfo);
+			Cookie cookie = new Cookie(SECURITY_CONTEXT, userInfo);
 			cookie.setPath("/");
 			cookie.setHttpOnly(true);
 			cookie.setMaxAge(60);

@@ -5,8 +5,8 @@ spring:
       client:
         registration:
           github:
-            clientId: cd8b56749faa48a1eddd
-            clientSecret: f53419ad2a285ec71319cbcc0676c86d4637b327
+            clientId: ad133f3fbbe0ee5514a4
+            clientSecret: 08ad5791037ec4d306a0f6b5f5fb3fc06dad4ef0
   servlet:
     multipart:
       max-file-size: 30MB

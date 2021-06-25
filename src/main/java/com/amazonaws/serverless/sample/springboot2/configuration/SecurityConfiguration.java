@@ -3,6 +3,7 @@ package com.amazonaws.serverless.sample.springboot2.configuration;
 import com.amazonaws.serverless.sample.springboot2.authrepo.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.amazonaws.serverless.sample.springboot2.authrepo.OAuth2AuthenticationFailureHandler;
 import com.amazonaws.serverless.sample.springboot2.authrepo.OAuth2AuthenticationSuccessHandler;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,11 +23,16 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.Serializable;
+import java.util.Base64;
+
 import static com.amazonaws.serverless.sample.springboot2.authrepo.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI;
 import static com.amazonaws.serverless.sample.springboot2.authrepo.HttpCookieOAuth2AuthorizationRequestRepository.fetchCookie;
 
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+
+    public static String SECURITY_CONTEXT = "SECURITY_CONTEXT";
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -70,8 +76,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 if (principal != null) {
                     if (principal instanceof DefaultOAuth2User){
                         DefaultOAuth2User user = (DefaultOAuth2User)principal;
-                        String userInfo = HttpCookieOAuth2AuthorizationRequestRepository.serialize(user);
-                        Cookie cookie = new Cookie("SECURITY_CONTEXT", userInfo);
+                        String userInfo = serialize(user);
+                        Cookie cookie = new Cookie(SECURITY_CONTEXT, userInfo);
                         cookie.setPath("/");
                         cookie.setHttpOnly(true);
                         cookie.setMaxAge(60);
@@ -85,7 +91,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
         @Override
         public SecurityContext loadContext(HttpRequestResponseHolder requestResponseHolder) {
             HttpServletRequest request = requestResponseHolder.getRequest();
-            DefaultOAuth2User user_context = fetchCookie(request, "SECURITY_CONTEXT").map(this::deserialize)
+            DefaultOAuth2User user_context = fetchCookie(request, SECURITY_CONTEXT).map(this::deserialize)
                     .orElse(null);
             if(user_context == null){
                 return generateNewContext();
@@ -97,11 +103,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
             }
         }
 
-
-
         private DefaultOAuth2User deserialize(Cookie cookie) {
 
-            return HttpCookieOAuth2AuthorizationRequestRepository.deserialize(cookie.getValue());
+            return SerializationUtils.deserialize(
+                    Base64.getUrlDecoder().decode(cookie.getValue()));
+        }
+
+        /**
+         * Serializes an object
+         */
+        public static String serialize(Serializable obj) {
+
+            return Base64.getUrlEncoder().encodeToString(
+                    SerializationUtils.serialize(obj));
         }
     }
 }
